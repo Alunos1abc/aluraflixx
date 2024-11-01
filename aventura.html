@@ -1,0 +1,607 @@
+<html lang="pt-br">
+<head>
+    <link rel="shortcut icon" type="image" href="botao-play.png">
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Kalnia+Glaze:wght@100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<title>
+  Aluraflix 
+</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  color: var(--light);
+}
+h3 {
+  size: 10px;
+  position:sticky;
+  text-align: left;
+  text-shadow: #141414;
+}
+p {
+  width: auto;
+  text-align:left;
+  position: relative;
+  text-shadow: #141414;
+  margin-left: 1rem; /* Adiciona um espaço entre o card e o texto */
+}
+.p-pag {
+  width: auto;
+  text-align:left;
+  position: relative;
+  text-shadow: #141414;
+}
+
+.nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.movie-grid {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 3rem;
+  position:sticky;
+}
+
+.movie-card {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  text-align: left;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+  text-align: left;
+}
+
+.movie-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  text-align: left;
+}
+.movie-poster-pag {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+}
+.movie-card-pag {
+  position: relative;
+  object-position: right;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+
+.movie-info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+  text-align: left;
+}
+
+.search-bar {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: var(--light);
+  width: 300px;
+}
+
+.search-bar:focus {
+  outline: none;
+  background: rgba(255,255,255,0.2);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.featured {
+  animation: pulse 2s infinite;
+}
+.progress-container {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+    z-index: 1001;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: #007bff;
+    width: 0%;
+    transition: width 0.2s ease;
+  }
+
+  .scroll-indicator {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scroll-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .scroll-dot.active {
+    background: #007bff;
+    transform: scale(1.5);
+  }
+
+  .scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-decoration: none;
+  }
+
+  .scroll-to-top.visible {
+    opacity: 1;
+  }
+
+  /* Animation for section content */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .movie-container {
+  display: flex; /* Cria um container flexbox */
+  align-items: center; /* Alinha os itens verticalmente no centro */
+  text-align: left;
+}
+
+.movie-card-pag {
+  position: relative;
+  text-align: left;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  flex-shrink: 0; /* Evita que o card seja comprimido se houver espaço insuficiente */
+}
+
+#A-Vida-Secreta {
+  background-color: #aaddec;
+  background-image: url(https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/80C3443D8616C82F1EC9378201EDA4C0EDCB275B9E2A2F85CBF1BF37D497984B/scale?width=1200&aspectRatio=1.78&format=webp);
+  background-size: cover; /* Adjust the value as needed */
+  color: #000000;
+  padding: 20px;
+  text-align: justify;
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+}
+#Uncharted-Fora-do-Mapa {
+  background-color: #142740;
+  background-image: url(https://dropcultura.com.br/wp-content/uploads/2022/06/uncharted-fora-do-mapa-critica.jpg);
+  background-size: cover; /* Adjust the value as needed */
+  color: #ffffff;
+  padding: 20px;
+  text-align: justify;
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+}
+#Amigos-Imaginarios {
+  background-color: #BBDDF2;
+  background-image: url(https://www.atoupeira.com.br/wp-content/uploads/2024/05/amigos-imaginarios-poster-nacional-1904-1201.jpg);
+  background-size: cover; /* Adjust the value as needed */
+  color: #000000;
+  padding: 20px;
+  text-align: justify;
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+}
+#Moana {
+  background-color: #F2B705;
+  background-image: url(https://recreio.com.br/media/_versions/legacy/2021/09/17/moana-1231865_widelg.jpg);
+  background-size: cover; /* Adjust the value as needed */
+  color: #ffffff;
+  padding: 20px;
+  text-align: justify;
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+}
+.marcado-Moana {
+  color: #ffffff;
+  background-color: rgba(3, 120, 166, 0.575); /* Laranja claro */
+  padding: 3px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.192);
+}
+.marcado {
+  color: #ffffff;
+  background-color: rgba(80, 160, 191, 0.411); /* Laranja claro */
+  padding: 3px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.192);
+}
+.marcado-Amigos {
+  color: #ffffff;
+  background-color: rgba(33, 64, 1, 0.473); /* Laranja claro */
+  padding: 3px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.192);
+}
+#Aquaman-2 {
+  background-color: #F2B705;
+  background-image: url(https://rollingstone.com.br/media/uploads/2024/02/aquaman-2-o-reino-perdido-ultimo-filme-do-universo-estendido-da-dc-estreia-nas-plataformas-digitais-foto-divulgacaowarner-bros-pictures.jpg);
+  background-size: cover; /* Adjust the value as needed */
+  color: #ffffff;
+  padding: 20px;
+  text-align: justify;
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+}
+.marcado-Aquaman {
+  color: #ffffff;
+  background-color: rgba(10, 19, 38, 0.534); /* Laranja claro */
+  padding: 3px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.192);
+}
+.aventura {
+  background-color: #aaddec;
+  color: #141414;
+  padding: 20px;
+}
+:root {
+  --primary: #e50914;
+  --dark: #141414;
+  --light: #ffffff;
+    --amarelo-degrade: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+}
+<script>
+  function scrollToTop() {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+</script>
+</style>
+</head>
+<body>
+  <a href="aventura.html" onclick="scrollToTop()" class="scroll-to-top">↑</a>
+  <script src="script.js"></script>  
+  <header class="cabeçalho">
+    <div class="container">
+      <input type="checkbox" id="menu" class="container__botao">
+      <label for="menu">
+        <span class="cabeçalho__menu-hamburguer container__imagem"></span>
+      </label>
+      <ul class="lista-menu">
+        <li class="lista-menu__item">
+          <a href="terror.html" class="lista-menu__link">Terror</a>
+        </li>
+        <li class="lista-menu__item">
+          <a href="suspense.html" class="lista-menu__link">Suspense</a>
+        </li>
+        <li class="lista-menu__item">
+          <a href="comedia.html" class="lista-menu__link">Comédia</a>
+        </li>
+        <li class="lista-menu__item">
+          <a href="aventura.html" class="lista-menu__link">Aventura</a>
+        </li>
+        <li class="lista-menu__item">
+          <a href="doramas.html" class="lista-menu__link">Doramas</a>
+        </li>
+      </ul>
+      <a href="index.html"><img src="img/logo-alura.png" alt="Logo da Aluraflix" class="container__imagem"></a>
+    </div>
+    <div class="container">
+      <a href="#"><img src="img/Favoritos.svg" alt="Meus favoritos" class="container__imagem"></a>
+      <a href="#"><img src="img/Compras.svg" alt="Carrinhos de compras" class="container__imagem"></a>
+      <a href="#"><img src="img/Usuario.svg" alt="Meu perfil" class="container__imagem"></a>
+    </div> 
+</header>
+<section class="banner">
+  <h2 class="banner__titulo">Já sabe o que vai assistir?</h2>
+  <p class="banner__texto">Encontre em nosso repositório o que precisa para seu Entretenimento!</p>
+  <input type="search" class="banner__pesquisa" placeholder="Qual será sua próxima série ou Filme Favorito?">
+</section>
+<section class="expositor">
+  <h1>Aventura</h1>
+  <main class="movie-grid">
+    <div class="movie-card featured">
+        <img class="movie-poster" alt="A Vida Secreta de Walter Mitty" title="A Vida Secreta de Walter Mitty" src="https://br.web.img2.acsta.net/pictures/210/513/21051366_20131021213607144.jpg" width="200" height="300">
+        <div class="movie-info">
+          <h3>A Vida Secreta de Walter Mitty</h3>
+          <p>2013 • Aventura/Comédia</p>
+          <p>1h 54m</p>
+        </div>
+      </div>
+    
+    <div class="movie-card">
+      <img class="movie-poster" alt="Uncharted: Fora do Mapa" title="Uncharted: Fora do Mapa" src="https://musicart.xboxlive.com/7/12345200-0000-0000-0000-000000000002/504/image.jpg?w=1920&h=1080" width="200" height="300">
+      <div class="movie-info">
+        <h3>Uncharted: Fora do Mapa</h3>
+        <p>2022 • Ação/Aventura</p>
+        <p>1h 56m</p>
+      </div>
+    </div>
+    
+    <div class="movie-card">
+      <img class="movie-poster" alt="Amigos Imaginários" title="Amigos Imaginários" src="https://ingresso-a.akamaihd.net/prd/img/movie/amigos-imaginarios/9ac26dbc-867c-4e6b-9347-a3e751e52dce.webp" width="200" height="300">
+      <div class="movie-info">
+        <h3>Amigos Imaginários</h3>
+        <p>2024 • Infantil/Comédia</p>
+        <p>1h 48m</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="movie-poster" alt="Moana - Um Mar de Aventuras" title="Moana - Um Mar de Aventuras" src="https://recreio.com.br/media/_versions/legacy/2021/09/17/moana-1231865_widelg.jpg" width="200" height="300">
+      <div class="movie-info">
+        <h3>Moana - Um Mar de Aventuras</h3>
+        <p>2016 • Infantil/Aventura</p>
+        <p>1h 47m</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="movie-poster" alt="Aquaman 2: O Reino Perdido" title="Aquaman 2: O Reino Perdido" src="https://www.claquete.com.br/fotos/filmes/poster/12501_grande.jpg" width="200" height="300">
+      <div class="movie-info">
+        <h3>Aquaman 2: O Reino Perdido</h3>
+        <p>2023 • Ação/Fantasia</p>
+        <p>1h 55m</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="movie-poster" alt="O Hobbit: Uma Jornada Inesperada" title="O Hobbit: Uma Jornada Inesperada" src="https://musicart.xboxlive.com/7/86b61100-0000-0000-0000-000000000002/504/image.jpg?w=1920&h=1080" width="200" height="300">
+      <div class="movie-info">
+        <p>2012 • Fantasia/Aventura</p>
+        <p>2h 49m</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="movie-poster" alt="Viagem ao Centro da Terra" title="Viagem ao Centro da Terra" src="https://br.web.img2.acsta.net/medias/nmedia/18/87/25/01/20028655.jpg" width="200" height="300">
+      <div class="movie-info">
+        <h3>Viagem ao Centro da Terra - O Filme</h3>
+        <p>2008 • Infantil/Aventura</p>
+        <p>1h 33m</p>
+      </div>
+    </div>
+
+    <div class="movie-card">
+      <img class="movie-poster" alt="127 Horas title="127 Horas" src="https://br.web.img3.acsta.net/medias/nmedia/18/87/33/30/20028710.jpg" width="200" height="300">
+      <div class="movie-info">
+        <p>2010 • Aventura/Thriller</p>
+        <p>1h 34m</p>
+      </div>
+    </div>
+  </main>  
+  <script>
+  document.querySelectorAll('.movie-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const movieTitle = card.querySelector('h3').textContent;
+    const returnToId = 'nosso-destino'; // Replace with the actual ID you want to return to
+    window.location.href = `file:///D:/02%20-%20TECNOLOGIA%20E%20ROBOTICA/4%C2%B0%20BIMESTRE/aluraflix-2-e/doramas.html/${movieTitle.toLowerCase().replace(/\s+/g, '-')}`;
+    window.history.pushState(null, null, `#${returnToId}`); // Add this line to push the specified ID to the history
+  });
+});
+  
+  const searchBar = document.querySelector('.search-bar');
+  searchBar.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    
+    document.querySelectorAll('.movie-card').forEach(card => {
+      const title = card.querySelector('h3').textContent.toLowerCase();
+      if (title.includes(searchTerm)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+  // Add scroll effect to navigation
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.nav');
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(0,0,0,0.9)';
+    } else {
+      nav.style.background = 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%)';
+    }
+  });
+  </script>
+   <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="scroll-dot active" data-section="A-Vida-Secreta"></div>
+    <div class="scroll-dot" data-section="Uncharted-Fora-do-Mapa"></div>
+    <div class="scroll-dot" data-section="Amigos-Imaginarios"></div>
+    <div class="scroll-dot" data-section="Moana"></div>
+    <div class="scroll-dot" data-section="Aquaman-2"></div>
+  </div>
+
+  <section id="A-Vida-Secreta" class="aventura">
+    <div class="content fade-in">
+      <h1>A Vida Secreta de Walter Mitty</h1>
+      <div class="movie-container">
+      <img class="movie-card-pag" alt="A Vida Secreta de Walter Mitty" title="A Vida Secreta de Walter Mitty" src="https://br.web.img2.acsta.net/pictures/210/513/21051366_20131021213607144.jpg" width="200" height="300">
+      <p>Walter Mitty (Ben Stiller) é o responsável pelo departamento de arquivo e revelação de fotografias da tradicional revista Life. Ele é um homem tímido, levando uma vida simples, perdido em seus sonhos. Ao receber um pacote com negativos do importante fotógrafo Sean O'Connell (Sean Penn), ele percebe que está faltando uma foto. O problema é que trata-se justamente da foto escolhida para ser a capa da última edição da revista. É quando, Walter, com o apoio de Cheryl (Kristen Wiig) é obrigado a embarcar em uma verdadeira aventura</p>
+    </div>
+    </div>
+  </section>
+
+  <section id="Uncharted-Fora-do-Mapa" class="aventura">
+    <div class="content fade-in">
+      <h1>Uncharted: Fora do Mapa</h1>
+      <div class="movie-container">
+      <img class="movie-card-pag" alt="NOME DA SERIE/FILME" title="NOME DA SERIE/FILME" src="https://musicart.xboxlive.com/7/12345200-0000-0000-0000-000000000002/504/image.jpg?w=1920&h=1080" width="200" height="300">
+      <p class="marcado">Baseado em uma das séries de videogame mais vendidas e aclamadas pela crítica de todos os tempos, Uncharted: Fora do Mapa serve como uma prequela para os jogos, seguindo o jovem explorador Nathan "Nate" Drake (Tom Holland), descendente do grande explorador Francis Drake, antes de ser conhecido como um famoso explorador. Mas antes disso, Nate vivia uma vida pacata como bartender em uma cidade, mas acaba se envolvendo com um estranho que viria ser um dos seus mais confiáveis companheiros. Uncharted: Fora do Mapa mostra sua primeira aventura de caça ao tesouro com o sagaz parceiro Victor "Sully" Sullivan (Mark Wahlberg). Os dois partem em uma perigosa busca pelo "maior tesouro nunca encontrado", na cidade sul americana de El Dorado, mas a aventura acaba se estendendo por todo o mundo, enquanto rastreiam pistas que podem levar ao irmão há muito perdido de Nathan. Porém, mal sabiam eles que seriam perseguidos por um grupo de mercenários que também buscam pelo tesouro perdido.</p>
+    </div>
+    </div>
+  </section>
+
+  <section id="Amigos-Imaginarios" class="aventura">
+    <div class="content fade-in">
+      <h1>Amigos Imaginários</h1>
+      <div class="movie-container">
+      <img class="movie-card-pag" alt="Amigos Imaginários" title="Amigos Imaginários" src="https://ingresso-a.akamaihd.net/prd/img/movie/amigos-imaginarios/9ac26dbc-867c-4e6b-9347-a3e751e52dce.webp" width="200" height="300">
+      <p class="marcado-Amigos">Amigos Imaginários é uma encantadora aventura infantil dirigida por John Krasinski responsável por The Office e Um Lugar Silencioso, que segue a jornada de Bea (Cailey Fleming), uma garota que adquire a habilidade de ver os amigos imaginários de todas as pessoas após sofrer um evento traumático. Quando Cal (Ryan Reynolds) descobre seu extraordinário poder, ele se junta com Bea e os dois se unem para uma missão emocionante que jamais pensaram ter: reconectar os amigos imaginários com suas crianças, agora adultas e muitas vezes esquecidas de seus companheiros mágicos, dessa forma, devolvem a sensibilidade do que era ser criança e ainda desbloqueiam uma memória de infância nesses adultos. Com um elenco estelar que inclui Steve Carell, Phoebe Waller-Bridge, Fiona Shaw, Louis Gossett Jr., Alan Kim e Liza Colón-Zayas, Amigos Imaginários promete encantar e inspirar públicos de todas as idades com sua mensagem de amizade, imaginação e redescoberta da criança interior.</p>
+    </div>
+    </div>
+  </section>
+
+  <section id="Moana" class="aventura">
+    <div class="content fade-in">
+      <h1>Moana - Um Mar de Aventuras</h1>
+      <div class="movie-container">
+      <img class="movie-card-pag" alt="Moana - Um Mar de Aventuras" title="Moana - Um Mar de Aventuras" src="https://br.web.img3.acsta.net/pictures/16/09/12/22/13/415370.jpg" width="200" height="300">
+      <p class="marcado-Moana">Moana Waialiki é uma corajosa jovem, filha única do chefe de uma tribo na Oceania, vinda de uma longa linhagem de navegadores. Quando os pescadores de sua ilha não conseguem pescar nenhum peixe e as colheitas falham, ela descobre que o semideus Maui causou a praga ao roubar o coração da deusa Te Fiti. Entusiasta das viagens marítimas, a jovem se vê querendo descobrir mais sobre seu passado e ajudar a comunidade, mesmo que a família queira proteger Moana a qualquer custo. Então, ela resolve partir em busca de seus ancestrais, habitantes de uma ilha mítica que ninguém sabe onde é. A única maneira de curar a ilha é persuadir Maui a devolver o coração de Te Fiti, então Moana parte em uma jornada épica pelo Pacífico. Moana começa sua jornada em mar aberto, onde enfrenta terríveis criaturas marinhas e descobre histórias do submundo. O filme é baseado em histórias da mitologia polinésia.</p>
+    </div>
+    </div>
+  </section>
+
+  <section id="Aquaman-2" class="aventura">
+    <div class="content fade-in">
+      <h1>Aquaman 2: O Reino Perdido</h1>
+      <div class="movie-container">
+      <img class="movie-card-pag" alt="Aquaman 2: O Reino Perdido" title="Aquaman 2: O Reino Perdido" src="https://www.claquete.com.br/fotos/filmes/poster/12501_grande.jpg" width="200" height="300">
+      <p class="marcado-Aquaman">Aquaman 2 é a sequência do filme Aquaman de 2018, que acompanha Arthur Curry (Jason Momoa), o filho do humano Tom Curry (Temuera Morrison) com a atlante Atlanna (Nicole Kidman). Ele cresce com a vivência de um humano e as capacidades metahumanas de um atlante. Nesta sequência, depois de não conseguir derrotar o rei dos mares pela primeira vez, Arraia Negra (Yahya Abdul-Mateen II) utiliza o poder do mítico Tridente Negro para liberar uma força antiga e maligna. Na tentativa de proteger Atlântida e o resto do mundo, Aquaman deve forjar uma aliança incômoda com um aliado improvável e deixar as diferenças de lado para evitar uma devastação irreversível.</p>
+    </div>
+    </div>
+  </section>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (winScroll / height) * 100;
+  document.querySelector(".progress-bar").style.width = scrolled + "%";
+});
+
+// Active section tracking
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav-links a');
+const scrollDots = document.querySelectorAll('.scroll-dot');
+const scrollTopButton = document.querySelector('.scroll-to-top');
+
+const observerOptions = {
+  threshold: 0.5
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      // Update navigation
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('../aluraflix-2-e/index.html').slice(1) === entry.target.id) {
+          link.classList.add('active');
+        }
+      });
+
+      // Update scroll dots
+      scrollDots.forEach(dot => {
+        dot.classList.remove('active');
+        if (dot.dataset.section === entry.target.id) {
+          dot.classList.add('active');
+        }
+      });
+
+      // Animate content
+      entry.target.querySelector('.fade-in').classList.add('visible');
+    }
+  });
+}, observerOptions);
+
+sections.forEach(section => {
+  observer.observe(section);
+});
+
+// Scroll to top button visibility
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 300) {
+    scrollTopButton.classList.add('visible');
+  } else {
+    scrollTopButton.classList.remove('visible');
+  }
+});
+
+// Scroll dot click handlers
+scrollDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    const section = document.getElementById(dot.dataset.section);
+    section.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Prevent default action and add smooth scroll for nav links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', (e) => {
+    e.preventDefault();
+    const section = document.querySelector(anchor.getAttribute('href'));
+    section.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+<section class="tópicos">
+    <h2 class="tópicos__titulo">TÓPICOS VISITADOS RECENTEMENTE</h2>
+    <ul class="tópicos__lista">
+      <li class="tópicos__item"><a href="#" class="tópicos__link">Android</a></li>
+      <li class="tópicos__item">
+        <a href="#" class="tópicos__link">A Vida Secreta</a>
+      </li>
+      <li class="tópicos__item">
+        <a href="#" class="tópicos__link">Uncharted Fora do Mapa</a>
+      </li>
+      <li class="tópicos__item">
+        <a href="#" class="tópicos__link">Amigos Imaginarios</a>
+      </li>
+      <li class="tópicos__item">
+        <a href="#" class="tópicos__link">Moana</a>
+      </li>
+      <li class="tópicos__item">
+        <a href="#" class="tópicos__link">Aquaman 2</a>
+      </li>
+    </ul>
+  </section>
+</body>
+</html>
